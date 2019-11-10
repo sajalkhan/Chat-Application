@@ -1,0 +1,5 @@
+{
+    "host" : "http://localhost:8000",
+    "dbURI": "mongodb+srv://soharub:y5uIjUtkrO5P5cYW@cluster0-yqf5f.mongodb.net/chatApp?retryWrites=true&w=majority",
+    "sessionSecret":"testSession"
+}
