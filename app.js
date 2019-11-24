@@ -11,6 +11,9 @@ let ioServer = data =>{
     data.locals.chatrooms = [];
     const server = require('http').Server(data);
     const io = require('socket.io')(server);
+    io.use((socket, next)=>{  // Bridging socket.io with session
+        require('./config/session')(socket.request,{},next);
+    });
     require('./Socket/socket')(io,data);
     return server;
 }

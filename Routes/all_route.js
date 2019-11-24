@@ -1,6 +1,7 @@
 const express = require('express');
 const passport = require('passport');
 const isLogin = require('../Auth/auth');
+const config = require('../config/dbConfig');
 const router = express.Router();
 
 router.get('/' ,(req, res)=>{
@@ -9,12 +10,16 @@ router.get('/' ,(req, res)=>{
 
 router.get('/rooms', isLogin.isUser, (req,res)=>{
     res.render('rooms',{
-        user: req.user
+        user: req.user,
+        host: config.host
     });
 });
 
 router.get('/chat', isLogin.isUser, (req,res)=>{
-    res.render('chatroom');
+    res.render('chatroom',{
+        user: req.user,
+        host: config.host
+    });
 });
 
 router.get('/auth/facebook', passport.authenticate('facebook'));
