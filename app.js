@@ -6,6 +6,15 @@ const session = require('./config/session');
 //social authenticatio logic
 require('./Auth/social_auth_rules')();
 
+//Create an Io server instance
+let ioServer = data =>{
+    data.locals.chatrooms = [];
+    const server = require('http').Server(data);
+    const io = require('socket.io')(server);
+    require('./Socket/socket')(io,data);
+    return server;
+}
+
 //init app
 const app = express();
 
@@ -32,4 +41,4 @@ app.use((req,res,next)=>{
     res.status(404).sendFile(process.cwd()+'/views/404.html'); 
 });
 
-module.exports = app;
+module.exports = {app,ioServer}
