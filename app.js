@@ -1,6 +1,10 @@
 const path = require('path');
 const express = require('express');
+const passport = require('passport');
 const session = require('./config/session');
+
+//social authenticatio logic
+require('./Auth/social_auth_rules')();
 
 //init app
 const app = express();
@@ -14,6 +18,10 @@ app.use(express.static(path.join(__dirname,'public')));
 
 //set session
 app.use(session);
+
+//set passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
 
 //set routes
 const chat_router = require('./Routes/all_route');

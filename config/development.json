@@ -1,5 +1,11 @@
 {
     "host" : "http://localhost:8000",
     "dbURI": "mongodb+srv://soharub:y5uIjUtkrO5P5cYW@cluster0-yqf5f.mongodb.net/chatApp?retryWrites=true&w=majority",
-    "sessionSecret":"testSession"
+    "sessionSecret":"testSession",
+    "fb":{
+        "clientID":"2232008800432375",
+        "clientSecret":"e29f4171b68ffe2d89bc5521696a1355",
+        "callbackURL":"//localhost:8000/auth/facebook/callback",
+        "profileFields": ["id","displayName","photos"]
+    }
 }
