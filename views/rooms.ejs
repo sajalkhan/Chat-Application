@@ -11,10 +11,35 @@
 	<script>
 	
 	$(()=>{
-		let socket =io('<%= host %>/roomslist');
+		
+		let socket = io('<%= host %>/roomslist');
+		let newChat_Room = $("#roomName");
 
-		socket.on('connect', ()=>{
-			console.log('connected to server!');
+		let renderChatRooms = chatRooms =>{
+			
+			let listStr = '';
+			let roomListDiv = $("#roomsListUL");
+			for(let chat of chatRooms){
+				listStr+=`<a href="/chat/${chat.roomId}"><li>${chat.roomName}</li></a>`;
+			}
+			
+			roomListDiv.html('').append(listStr);
+
+		}
+
+		//Get a list of chat room
+		socket.emit('getChatrooms'); // trigger an event from client side
+
+		//Event listener for ChatRoomsList
+		socket.on('chatRoomsList', chatRooms =>{
+			renderChatRooms(JSON.parse(chatRooms));
+		});
+
+		$("#createBtn").on('click', ()=>{
+			if(newChat_Room!=''){
+				socket.emit('createNewRoom', newChat_Room.val()); // trigger an event
+				newChat_Room.val('');
+			}
 		});
 
 	});
@@ -32,13 +57,12 @@
 			<a href="/logout" id="logOutBtn">Logout</a>
 		</div>
 		<div class="controls">
-			<input type="text" name="roomName" placeholder="Create a new Chatroom">
+			<input type="text" id="roomName" name="roomName" placeholder="Create a new Chatroom">
 			<a href="#" id="createBtn">Create</a>
 		</div>
 		<div class="roomsListDiv">
 			<ul class="roomsList" id="roomsListUL">
 			<!-- Loop list items here -->
-				<a href="chatroom.htm"><li>World Cuisine</li></a>
 				<a href="chatroom.htm"><li>Coffee and Conversations</li></a>
 			<!-- Loop ends -->
 			</ul>
