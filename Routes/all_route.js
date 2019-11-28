@@ -2,6 +2,7 @@ const express = require('express');
 const passport = require('passport');
 const isLogin = require('../Auth/auth');
 const config = require('../config/dbConfig');
+const h = require('../Helper/helperMethods');
 const router = express.Router();
 
 router.get('/' ,(req, res)=>{
@@ -15,10 +16,18 @@ router.get('/rooms', isLogin.isUser, (req,res)=>{
     });
 });
 
-router.get('/chat', isLogin.isUser, (req,res)=>{
+router.get('/chat/:id', isLogin.isUser, (req,res,next)=>{
+
+    //find the chatroom with the given id and if found render it 
+    let getRoom = h.findRoombyid(req.app.locals.chatrooms, req.params.id);
+    
+    if(getRoom === undefined) return next();
+    
     res.render('chatroom',{
         user: req.user,
-        host: config.host
+        host: config.host,
+        room: getRoom.roomName,
+        roomId: getRoom.roomId
     });
 });
 

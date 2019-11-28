@@ -1,5 +1,5 @@
 'use strict'
-let crypto = require('crypto'); // it's use for generate unique information
+let h = require('../Helper/helperMethods');
 
 module.exports = (io,data) =>{
 
@@ -17,12 +17,12 @@ module.exports = (io,data) =>{
             
             // check to see if a room with same title exists or not
             //if not then create one and broadcast to everyone
-            if(!findChatroom(all_rooms, newChat_Room)){
+            if(!h.findChatroom(all_rooms, newChat_Room)){
                 
                 //create a new room and broadcast to all
                 all_rooms.push({
                     roomName: newChat_Room,
-                    roomId: createRoomId(),
+                    roomId: h.createRoomId(),
                     users:[]
                 });
 
@@ -35,21 +35,4 @@ module.exports = (io,data) =>{
         });
     });
 
-}
-
-
-
-//find a chatroom by a given name
-let findChatroom = ((all_rooms, roomName)=>{
-    
-    let find = all_rooms.findIndex((rooms)=>{
-        return rooms.roomName === roomName;
-    });
-
-    return find>-1? true: false;
-});
-
-//Create a function that generate a unique roomId
-let createRoomId = ()=>{
-    return crypto.randomBytes(24).toString('hex');
 }
