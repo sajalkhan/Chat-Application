@@ -3,8 +3,8 @@
 
 const session = require('express-session');
 const mongoStore = require('connect-mongo')(session);
-const config = require('./dbConfig');
-const db = require('../Database/db');
+const config = require('../config/dbConfig');
+const mongoose = require('mongoose');
 
 if(process.env.NODE_ENV == 'production'){
     module.exports = session({
@@ -12,7 +12,7 @@ if(process.env.NODE_ENV == 'production'){
         resave: false,
         saveUninitialized: false,
         store: new mongoStore({
-            mongooseConnection: db.mongoose.connection
+            mongooseConnection: mongoose.connection
         })
     });
 }else{
