@@ -23,8 +23,44 @@ let findRoombyid = ((all_rooms, roomId)=>{
     });
 });
 
+let addUserToRoom = ((all_rooms, data, socket)=>{
+   
+    //get the room object
+    let getRoom = findRoombyid(all_rooms, data.roomId);
+    if(getRoom !== undefined){
+        
+        //get the active user Id ( object id used in session )
+        let userId = socket.request.session.passport.user;
+        //check to see if the user already exist in the chat room
+        let checkUser = getRoom.Alluser.findIndex((element)=>{
+            return element.userId === userId;
+        });
+
+        //if the user already present in the room remove him first
+        if(checkUser>-1){
+            getRoom.Alluser.splice(checkUser, 1);
+        }
+
+        //push the user into the room's user array
+        getRoom.Alluser.push({
+            socketId : socket.id,
+            userId,
+            user: data.user,
+            userPic: data.userPic
+        });
+
+        // join the room channel
+        socket.join(data.roomId);
+
+        // return the update room object
+        return getRoom.Alluser;
+    }
+
+});
+
 module.exports = {
     findChatroom,
     createRoomId,
-    findRoombyid
+    findRoombyid,
+    addUserToRoom
 }

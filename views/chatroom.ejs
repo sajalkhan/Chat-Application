@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>ChatCat - Topic Goes Here</title>
+	<title>ChatCat - <%= room %></title>
 	<link rel="stylesheet" href="/css/chatroomStyles.css">
 	<script src="/js/jquery-2.1.4.min.js"></script>
 	<script src="/socket.io/socket.io.js"></script>
-	<script src="babel.min.js"></script>
+	<script src="/babel.min.js"></script>
 
 	<script>
 
@@ -15,6 +15,75 @@
 		let roomId = '<%= roomId%>';
 		let user = '<%= user.fullName %>';
 		let userPic = '<%= user.profilePic%>';
+		let ChatuserList = $('#chatUsersList');
+		let userInput = $("input[name='userInput'");
+		let chatMessage = $('.chatMessages');
+
+
+		socket.on('connect', ()=>{
+			
+			//trigger an event 
+			socket.emit('join',{
+				roomId,
+				user,
+				userPic
+			});
+
+		});
+
+		let userList = user =>{
+			return `<div class="userBlock">
+					<div class="userPic"><img src="${user.userPic}" alt="${user.user}"></div>
+					<div class="cuserName">${user.user}</div>
+				</div>`;
+		}
+
+		let updateMessageFeed = (userpic, message) =>{
+
+			let updateMessage =`<div class="chatBlock">
+					<div class="userPic"><img src="${userpic}"></div>
+					<div class="chatMsg">${message}</div>
+				</div>`;
+			
+			$(updateMessage).hide().appendTo(chatMessage).slideDown(100);
+			
+		}
+
+		socket.on('updateUserList', data =>{
+			let parseData = JSON.parse(data);
+			let userListData = '';
+
+			for(let data of parseData){
+				userListData += userList(data);
+			}
+
+			ChatuserList.html('').append(userListData);
+		});
+
+		//message send functionality
+		userInput.on('keyup',function(evt){
+			evt.preventDefault();
+			let messageFld = $(this);
+
+			if(evt.which === 13 && messageFld.val() !==''){
+				//send message
+				socket.emit('newMessage',{
+					roomId,
+					user,
+					userPic,
+					message: messageFld.val()
+				});
+
+				updateMessageFeed(userPic, messageFld.val());
+				messageFld.val('');
+			}
+		});
+
+		//instening incoming message
+		socket.on('inMessage', data =>{
+			let parseData = JSON.parse(data);
+			updateMessageFeed(parseData.userPic, parseData.message);
+		});
 	});
 
 	</script>
@@ -25,8 +94,8 @@
 			<h1>ChatCAT | <%= room %></h1>
 		</div>
 		<div class="controls">
-			<div class="userPicHolder"><img src="/img/user.jpg" alt="John Doe"></div>
-			<p class="userName">John Doe</p>
+			<div class="userPicHolder"><img src="<%= user.profilePic %>" alt="<%= user.fullName %>"></div>
+			<p class="userName"><%= user.fullName %></p>
 			<a href="/rooms" id="roomsBtn">Rooms</a>
 			<a href="/logout" id="logOutBtn">Logout</a>
 		</div>
@@ -34,10 +103,7 @@
 			<div class="chatMessagesPanel">
 				<div class="chatMessages">
 				<!-- Loop this for chat messages -->
-				<div class="chatBlock">
-					<div class="userPic"><img src="/img/user.jpg"></div>
-					<div class="chatMsg">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Deleniti perferendis eius aut nesciunt necessitatibus ad nulla, qui sequi, id nam. Possimus odit aut nisi veritatis amet distinctio id officiis ipsam!</div>
-				</div>					
+									
 				<!-- loop end -->
 				</div>
 				<div class="typePanel">
@@ -45,12 +111,9 @@
 					<a href="#" id="uploadFile" class="fileUploadBtn">Photo</a>
 				</div>
 			</div>
-			<div class="chatUsers">
+			<div id="chatUsersList" style=" padding:5px 5px 5px 5px;float: right;">
 			<!-- Loop this for chat users -->
-				<div class="userBlock">
-					<div class="userPic"><img src="/img/user.jpg" alt="John Doe"></div>
-					<div class="cuserName">John Doe</div>
-				</div>
+				
 			<!-- loop end -->
 			</div>
 		</div>
